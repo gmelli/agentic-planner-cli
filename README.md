@@ -123,6 +123,19 @@ python -m pytest tests/ -v --cov=. --cov-report=term-missing
 - **tools.py**: Implementation of search_web (DuckDuckGo) and summarize_text (DistilBART) tools
 - **main.py**: CLI entry point and Executor class for running planned steps
 
+## References
+
+This implementation draws from research in agentic AI systems and command-line interface design:
+
+1. **Agentic Planning CLI Tool** - Conceptual framework and design principles  
+   https://www.gabormelli.com/RKB/Agentic_Planning_CLI_Tool
+
+2. **Command-Line Interface** - Foundational CLI design concepts  
+   https://www.gabormelli.com/RKB/CLI-based_Program
+
+3. **Agentic CLI Tools Compared** - Contemporary analysis of AI-powered CLI tools  
+   https://research.aimultiple.com/agentic-cli
+
 ## License
 
 Apache 2.0
