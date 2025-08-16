@@ -126,6 +126,8 @@ AVOID THESE:
     parser.add_argument("--max-steps", type=int, default=config.DEFAULT_MAX_STEPS, help="Maximum number of steps to execute")
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
     parser.add_argument("--explain", action="store_true", help="Show how the AI decomposes the goal")
+    parser.add_argument("--model-profile", choices=["lite", "full"], default="full", 
+                       help="Model profile: lite (~800MB RAM) or full (~1.5GB RAM)")
     
     args = parser.parse_args()
     
@@ -174,6 +176,14 @@ AVOID THESE:
             print("Demonstrates AI-driven goal decomposition and execution")
             print("Architecture: Goal → Plan (Flan-T5-Small) → Execute (Search + Summarize)")
             print("=" * 50)
+        
+        # Override model configuration if lite profile requested
+        if args.model_profile == "lite":
+            config.MODEL_PROFILE = "lite"
+            config.PLANNING_MODEL = config.MODEL_PROFILES["lite"]["planning"]
+            config.SUMMARIZATION_MODEL = config.MODEL_PROFILES["lite"]["summarization"]
+            if args.verbose:
+                print(f"[CONFIG] Using lite model profile ({config.MODEL_PROFILES['lite']['ram_usage']} RAM)")
         
         planner = Planner(verbose=args.verbose, explain=args.explain)
         executor = Executor(max_steps=args.max_steps, verbose=args.verbose)

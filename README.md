@@ -56,6 +56,10 @@ docker run --rm agentic-planner-cli "Research climate change solutions" --max-st
 - `goal`: The goal you want to achieve (required)
 - `--max-steps N`: Maximum number of steps to execute (default: 10)
 - `--verbose, -v`: Enable verbose output showing planning and execution details
+- `--explain`: Show how the AI decomposes the goal (includes --verbose)
+- `--model-profile {lite|full}`: Choose model profile (default: full)
+  - **lite**: ~800MB RAM, ~400MB disk (flan-t5-base + bart-large-cnn)
+  - **full**: ~1.5GB RAM, ~550MB disk (flan-t5-small + distilbart-cnn)
 
 ## Available Tools
 
@@ -63,6 +67,88 @@ The planner can use these built-in tools:
 
 - **search_web(query)**: Searches the web using DuckDuckGo API
 - **summarize_text(text)**: Generates a concise summary using DistilBART
+
+## Sample Outputs
+
+### Planning Quality Comparison
+
+**DistilGPT-2 (Previous)**:
+```
+Goal: "Research quantum computing trends"
+Plan: "search_web(latest news) summarize_text(search results)"
+Issues: Generic "latest news" regardless of goal, poor instruction following
+```
+
+**Flan-T5-Small (Current)**:
+```
+Goal: "Research quantum computing trends"
+Plan: "Step 1: search_web(quantum computing trends research)
+       Step 2: summarize_text(search results)"
+Improvements: Goal-specific queries, structured step format, reliable parsing
+```
+
+### Execution Example
+
+```bash
+$ docker run --rm agentic-planner-cli "Find news about edge computing" --explain
+
+[PLANNER] Loading Flan-T5-Small (220M parameters)
+[INFERENCE] Generating plan for goal: Find news about edge computing
+[PLAN] Step 1: search_web(edge computing news)
+[PLAN] Step 2: summarize_text(search results)
+
+[EXECUTOR] Executing Step 1: search_web
+[SEARCH] Querying DuckDuckGo API
+[QUERY] 'edge computing news'
+[COMPLETE] Search finished: 3 sections, 847 chars
+
+[EXECUTOR] Executing Step 2: summarize_text
+[SUMMARIZE] Processing text with DistilBART
+[OUTPUT] Summary generated: 156 characters
+
+[RESULT] Edge computing continues growing with 5G integration and IoT expansion...
+```
+
+## Extending the CLI
+
+### Adding New Tools
+
+The tool system uses a simple plugin pattern. To add a new tool:
+
+1. **Add the tool method** to `tools.py`:
+```python
+def my_new_tool(self, argument: str) -> str:
+    """Your tool implementation."""
+    return "tool result"
+```
+
+2. **Register in execute_tool()** method:
+```python
+def execute_tool(self, tool_name: str, argument: str) -> str:
+    if tool_name == "my_new_tool":
+        return self.my_new_tool(argument)
+    # ... existing tools
+```
+
+3. **Update the planner** to recognize your tool in `planner.py` `_parse_steps()`:
+```python
+if 'my_new_tool' in line.lower():
+    steps.append({'tool': 'my_new_tool', 'argument': extracted_argument})
+```
+
+### Tool Requirements
+
+- **Input**: Single string argument
+- **Output**: String result (for chaining between steps)
+- **Error handling**: Return error messages as strings, don't raise exceptions
+- **Context**: Access previous results via `self.context` in executor
+
+### Available Tool Slots
+
+The current architecture supports these tool categories:
+- **Information retrieval**: search_web, search_local, fetch_data
+- **Processing**: summarize_text, translate_text, analyze_sentiment  
+- **Output**: save_file, send_notification, format_report
 
 ## Development
 
@@ -89,6 +175,21 @@ The project includes comprehensive unit tests that mock external dependencies:
 
 ```bash
 python -m pytest tests/ -v --cov=. --cov-report=term-missing
+```
+
+#### Testing Strategy
+
+- **Model Mocking**: Tests mock `transformers.pipeline` to avoid downloading models during CI
+- **Network Mocking**: Web search tests use `unittest.mock.patch` for `requests.get`
+- **Coverage**: Tests cover both success and failure scenarios for all tools
+- **CI-Friendly**: No external dependencies required, tests run offline
+
+Example of model mocking in `test_planner.py`:
+```python
+@patch('planner.AutoModelForSeq2SeqLM')
+@patch('planner.AutoTokenizer') 
+def setUp(self, mock_tokenizer, mock_model):
+    # Prevents actual model downloads during testing
 ```
 
 ## Resource Requirements
