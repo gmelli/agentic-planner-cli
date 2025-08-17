@@ -111,7 +111,7 @@ Improvements: Goal-specific queries, structured step format, reliable parsing
 ```bash
 $ docker run --rm agentic-planner-cli "explain quantum computing to me" --explain
 
-[PLANNER] Loading Flan-T5-Small (220M parameters)
+[PLANNER] Loading Flan-T5-Small (80M parameters)
 [INFERENCE] Generating plan for goal: explain quantum computing to me
 [PLAN] Step 1: search_web(quantum computing)
 [PLAN] Step 2: summarize_text(search results)
@@ -243,9 +243,9 @@ def test_api_quantum_computing_response(self):
 - **Network**: Internet connection for initial model download and web search
 
 ### Model Details
-- **Flan-T5-Small**: 220M parameters, ~300MB download (planning)
-- **DistilBART-CNN**: 306M parameters, ~250MB download (summarization)
-- **Total**: 526M parameters, ~550MB disk usage
+- **Flan-T5-Small**: 80M parameters, ~300MB download (planning)
+- **DistilBART-CNN**: 306M parameters, ~250MB download (summarization)  
+- **Total**: 386M parameters, ~550MB disk usage
 
 ### Performance Expectations
 - **First run**: 2-4 minutes (model downloads)

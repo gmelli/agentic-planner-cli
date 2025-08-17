@@ -2,9 +2,9 @@
 
 ## 1. Planning Model Selection
 
-### Current: Flan-T5-Small (Instruction-Tuned) ✅ IMPLEMENTED
-- **Pros**: Instruction-tuned, better reasoning, consistent planning
-- **Cons**: Slightly larger than DistilGPT-2
+### Current: Flan-T5-Small (Instruction-Tuned) ✅ IMPLEMENTED  
+- **Pros**: Instruction-tuned, better reasoning, consistent planning, compact at 80M parameters
+- **Cons**: Requires more sophisticated prompt engineering than raw generation models
 
 ### Previous: DistilGPT-2 (Text Generation)
 - **Issue**: Not instruction-tuned, generated "latest news" regardless of goal

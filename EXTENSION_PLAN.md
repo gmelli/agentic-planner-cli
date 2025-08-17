@@ -1,119 +1,114 @@
-# Extensible Tool Framework Design
+# Current Tool Extension Pattern
 
-## Architecture Overview
+## Current Architecture (Simple & Working)
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Planner       │    │   Tool Registry  │    │   Tool Plugins  │
-│ (Flan-T5-Small)│───▶│   & Validator    │◀───│   (Extensible)  │
+│   Planner       │    │   Tools Class    │    │   Tool Methods  │
+│ (Flan-T5-Small)│───▶│   (tools.py)     │◀───│   (2 built-in)  │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                        │                        │
          ▼                        ▼                        ▼
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Executor      │    │   Context Mgmt   │    │   Built-in +    │
-│   (Orchestrator)│───▶│   & State        │    │   Custom Tools  │
+│   Executor      │    │   Context Dict   │    │   search_web    │
+│   (main.py)     │───▶│   (simple)       │    │   summarize_text│
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-## Core Components
+## How to Add New Tools (Current Implementation)
 
-### 1. Tool Registry System
+### Step 1: Add Tool Method to tools.py
 ```python
-class ToolRegistry:
-    def __init__(self):
-        self.tools = {}
-        self.schemas = {}
+def my_new_tool(self, argument: str) -> str:
+    """Your tool implementation.
     
-    def register_tool(self, name: str, func: callable, schema: dict):
-        # Validate tool function signature
-        # Store tool with input/output schema
-        pass
-    
-    def get_available_tools(self) -> List[str]:
-        # Return list of tool names for planner prompt
-        pass
-    
-    def execute_tool(self, name: str, **kwargs) -> dict:
-        # Execute with validation and error handling
-        pass
+    Args:
+        argument: Input string from planner
+        
+    Returns:
+        Result string for next step or final output
+    """
+    try:
+        # Your tool logic here
+        result = do_something(argument)
+        return result
+    except Exception as e:
+        return f"Tool failed: {str(e)}"
 ```
 
-### 2. Tool Plugin Interface
+### Step 2: Register in execute_tool() Method
 ```python
-from abc import ABC, abstractmethod
-
-class ToolPlugin(ABC):
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
-    
-    @property
-    @abstractmethod
-    def description(self) -> str:
-        pass
-    
-    @property
-    @abstractmethod
-    def schema(self) -> dict:
-        pass
-    
-    @abstractmethod
-    def execute(self, **kwargs) -> dict:
-        pass
+def execute_tool(self, tool_name: str, argument: str) -> str:
+    if tool_name == "search_web":
+        return self.search_web(argument)
+    elif tool_name == "summarize_text":
+        return self.summarize_text(argument)
+    elif tool_name == "my_new_tool":  # Add this line
+        return self.my_new_tool(argument)
+    else:
+        return f"Unknown tool: {tool_name}"
 ```
 
-### 3. Enhanced Context Management
+### Step 3: Update Planner Recognition
 ```python
-class ExecutionContext:
-    def __init__(self):
-        self.variables = {}
-        self.step_history = []
-        self.tool_outputs = {}
-    
-    def store_result(self, step_id: str, tool: str, result: any):
-        # Store with metadata and type information
-        pass
-    
-    def resolve_variable(self, var_name: str) -> any:
-        # Resolve context variables like ${last_search}
-        pass
+# In planner.py _parse_steps() method
+if 'my_new_tool' in line.lower():
+    steps.append({'tool': 'my_new_tool', 'argument': extracted_argument})
 ```
 
-## Implementation Steps
+## Current Tool Examples
 
-### Phase 1: Core Framework
-1. Create `tool_registry.py` with registration system
-2. Define `tool_plugin.py` base class
-3. Refactor existing tools to use plugin interface
-4. Update planner to use registry for available tools
+### Implemented Tools
+- **search_web**: DuckDuckGo API with retry logic
+- **summarize_text**: DistilBART with text truncation
 
-### Phase 2: Plugin System
-1. Create `plugins/` directory structure
-2. Implement plugin discovery and loading
-3. Add tool validation and schema checking
-4. Create example plugins (file_io, calculator, etc.)
+### Tool Requirements
+- **Input**: Single string argument
+- **Output**: String result (chainable)
+- **Error handling**: Return error messages as strings, don't raise exceptions
+- **Stateless**: Don't maintain state between calls
 
-### Phase 3: Advanced Features
-1. Variable interpolation in tool arguments (${previous_result})
-2. Conditional execution based on tool outputs
-3. Parallel tool execution where safe
-4. Tool dependency management
-
-## Example Plugin Structure
-
-```
-plugins/
-├── __init__.py
-├── file_operations.py     # read_file, write_file, list_directory
-├── calculations.py        # calculate, convert_units
-├── web_extended.py        # parse_html, extract_links
-└── data_processing.py     # filter_data, transform_json
+## Context Management (Current)
+```python
+# In executor.py
+self.context = {
+    'last_search_result': result,  # Available for summarization
+    'step_1_result': result,       # Historical results
+    f'step_{i+1}_result': result   # Sequential numbering
+}
 ```
 
-## Benefits
-- **Modularity**: Tools as independent, testable components
-- **Extensibility**: Easy addition of domain-specific tools
-- **Validation**: Schema-based input/output checking
-- **Discovery**: Automatic tool detection and registration
-- **Maintainability**: Clear separation of concerns
+## Extension Ideas for Future
+
+### Information Retrieval
+- **search_local**: Search local file system
+- **fetch_url**: Direct URL content retrieval
+- **query_database**: SQL database queries
+
+### Text Processing  
+- **translate_text**: Language translation
+- **extract_entities**: Named entity recognition
+- **analyze_sentiment**: Sentiment analysis
+
+### Output Generation
+- **save_file**: Write results to disk
+- **format_report**: Structure data into reports
+- **send_notification**: Alert mechanisms
+
+## Why This Simple Pattern Works
+
+1. **Proven**: Successfully demonstrates agentic planning
+2. **Testable**: Easy to mock and unit test
+3. **Understandable**: Clear flow from goal to result
+4. **Maintainable**: Minimal complexity, easy to debug
+5. **Extensible**: New tools can be added in minutes
+
+## Migration Path (If Needed)
+
+If the tool set grows beyond ~10 tools, consider:
+1. Move to plugin directory structure
+2. Add automatic tool discovery
+3. Implement schema validation
+4. Add dependency management
+
+**Current verdict**: The simple pattern serves the educational and demo purposes perfectly. Keep it simple until complexity is actually needed.
