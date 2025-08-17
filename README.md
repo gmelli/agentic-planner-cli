@@ -1,13 +1,21 @@
 # Agentic Planner CLI
 
-A lightweight command-line tool that demonstrates agentic planning using a local language model. The tool takes a user's goal, breaks it into sub-tasks using Flan-T5-Small, and executes built-in functions to achieve the goal.
+A demonstration of **AI-driven goal decomposition** using local language models. Shows how AI can autonomously break down natural language goals into executable action sequences, then orchestrate tools to achieve them - all without external API dependencies.
+
+## What This Demonstrates
+
+- **Agentic Planning**: AI autonomously decides what steps to take and which tools to use
+- **Goal Decomposition**: Converts "explain quantum computing to me" → search + summarize actions  
+- **Local AI Pipeline**: Complete workflow runs on local hardware (Flan-T5 + DistilBART)
+- **Transparent Reasoning**: `--explain` mode shows how AI breaks down goals into steps
+- **Tool Orchestration**: AI coordinates multiple tools (search → summarization) with context flow
 
 ## Features
 
-- **Local Models**: Uses Flan-T5-Small for planning and DistilBART for summarization (no external API keys required)
-- **Built-in Tools**: Web search via DuckDuckGo and text summarization
-- **Docker Support**: Runs in a single container for easy setup
-- **Agentic Loop**: Automatically plans and executes multi-step tasks
+- **No External AI APIs**: Everything runs locally in Docker
+- **Conversational Input**: Natural language goals like "help me understand machine learning"  
+- **Professional Output**: Clean formatting suitable for technical demonstrations
+- **Multiple Modes**: Basic, verbose, explain, and resource-optimized profiles
 
 ## Quick Start
 
@@ -283,11 +291,23 @@ This implementation draws from research in agentic AI systems and command-line i
 
 Apache 2.0
 
-## Responsible Use
+## Educational Purpose
 
-This tool uses a local language model for demonstration purposes. Do not rely on it for:
-- Critical business decisions
-- Medical or legal advice
-- Tasks requiring high accuracy or real-time information
+This tool demonstrates **agentic AI concepts** for learning and experimentation:
 
-The tool is designed for educational and experimental use to showcase agentic AI planning concepts.
+**What it teaches:**
+- How AI can plan and execute multi-step tasks autonomously
+- The difference between simple Q&A and agentic behavior  
+- Local AI deployment without cloud dependencies
+- Transparent AI reasoning and decision-making processes
+
+**What it's NOT:**
+- A production AI assistant (use ChatGPT, Claude, etc. for real work)
+- A replacement for specialized tools (use proper search engines, research databases)
+- Suitable for critical decisions (it's a demonstration, not a business tool)
+
+**Perfect for:**
+- Understanding agentic AI architecture
+- Technical presentations and demos
+- Educational workshops on local AI deployment
+- Experimenting with AI planning concepts
