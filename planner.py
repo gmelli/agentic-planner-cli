@@ -61,7 +61,24 @@ class Planner:
             print(f"\n[PLANNING] Breaking down goal: '{goal}'")
         
         # Extract key terms from the goal for better search queries
-        search_query = goal.replace("Find information about ", "").replace("Research ", "").replace("Explain ", "")
+        search_query = goal
+        conversational_prefixes = [
+            "explain ", "help me understand ", "teach me about ", "tell me about ",
+            "what should i know about ", "give me an overview of ", "summarize ",
+            "find information about ", "research "
+        ]
+        
+        for prefix in conversational_prefixes:
+            if search_query.lower().startswith(prefix):
+                search_query = search_query[len(prefix):].strip()
+                break
+        
+        # Remove conversational suffixes
+        conversational_suffixes = [" to me", " for me", " please", " for beginners"]
+        for suffix in conversational_suffixes:
+            if search_query.lower().endswith(suffix):
+                search_query = search_query[:-len(suffix)].strip()
+                break
         
         if self.verbose:
             print(f"[EXTRACTION] Converted to search query: '{search_query}'")
@@ -98,11 +115,11 @@ Plan:"""
                 print(f"[RESPONSE] Full output: '{generated_text}'")
             
             if self.explain:
-                print(f"\n🧠 AI REASONING:")
-                print(f"📝 Original goal: '{goal}'")
-                print(f"🔍 Extracted search terms: '{search_query}'")
-                print(f"🤖 Flan-T5 generated: '{generated_text}'")
-                print(f"⚙️  Parsing logic converted this into executable steps")
+                print(f"\n[REASONING] AI Planning Process:")
+                print(f"[GOAL] Original goal: '{goal}'")
+                print(f"[EXTRACT] Search terms: '{search_query}'")
+                print(f"[GENERATE] Flan-T5 output: '{generated_text}'")
+                print(f"[PARSE] Converted to executable steps")
             
             # Parse the generated plan
             steps = self._parse_steps(generated_text, search_query)

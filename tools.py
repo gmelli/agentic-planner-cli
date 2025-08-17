@@ -100,17 +100,17 @@ class Tools:
         # Extract relevant information
         results = []
         
-        # Get instant answer if available
-        if data.get('Answer'):
-            results.append(f"Answer: {data['Answer']}")
-            if self.verbose:
-                print(f"[DATA] Found instant answer: {len(data['Answer'])} chars")
-        
-        # Get abstract if available
+        # Get abstract first (primary content)
         if data.get('Abstract'):
             results.append(f"Abstract: {data['Abstract']}")
             if self.verbose:
                 print(f"[DATA] Found abstract: {len(data['Abstract'])} chars")
+        
+        # Get instant answer if available (secondary)
+        if data.get('Answer'):
+            results.append(f"Answer: {data['Answer']}")
+            if self.verbose:
+                print(f"[DATA] Found instant answer: {len(data['Answer'])} chars")
         
         # Get related topics
         if data.get('RelatedTopics'):

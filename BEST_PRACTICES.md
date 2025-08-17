@@ -166,11 +166,40 @@ logger.info("step_execution",
 - **End-to-end workflows**: Complete goal → result cycles
 - **Tool interactions**: Verify data flows correctly between tools
 - **Context persistence**: Test variable storage and retrieval
+- **API field priority**: Test actual API responses, not just successful cases
 
 ### Load Testing
 - **Concurrent executions**: Multiple plans running simultaneously
 - **Memory pressure**: Large inputs and outputs
 - **Extended runs**: Long-running agentic sessions
+
+### API Integration Best Practices
+**Lesson Learned**: The DuckDuckGo API parsing bug showed the importance of:
+
+1. **Test real API responses first**: Don't write parsing logic based on assumptions
+   ```bash
+   # Always test actual API behavior during development
+   curl -s "https://api.service.com/?q=test" | jq '.'
+   ```
+
+2. **Understand field priority**: DuckDuckGo populates `Abstract` (primary) over `Answer` (secondary)
+   - Original code checked `Answer` first → missed most Wikipedia content
+   - Fixed by prioritizing `Abstract` field
+
+3. **Integration testing catches what unit tests miss**: 
+   - Unit tests mocked successful responses → bug invisible
+   - Real Docker testing revealed "No detailed results found" failures
+
+4. **Manual verification of examples**: 
+   - README examples should be tested with actual tool before publishing
+   - Complex queries like "Find and summarize latest news" often fail vs simple topics
+
+### Style Consistency
+**Lesson Learned**: When establishing style guidelines (e.g., "no emojis"), systematically verify:
+
+1. **Search entire codebase**: Use `grep -r "🧠\|📝\|🔍\|🤖\|⚙️"` to find all instances
+2. **Check new features**: Ensure additions follow established conventions  
+3. **Feature flags consistency**: `--explain` mode must match main output style
 
 ## 9. Model Governance
 

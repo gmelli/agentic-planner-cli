@@ -1,18 +1,14 @@
 # DEMO SCRIPT FOR AGENTIC PLANNER CLI
-# Execute these commands in order during asciinema recording
+# Execute these commands during asciinema recording
 # Total time: ~30 seconds with 2-3 second pauses between commands
 
-# 1. Show help (3 seconds)
 docker run --rm agentic-planner-cli --help
 
-# 2. Basic planning demo (10 seconds)  
-docker run --rm agentic-planner-cli "Find recent news about quantum computing"
+docker run --rm agentic-planner-cli "explain quantum computing to me"
 
-# 3. Explain mode with AI reasoning (12 seconds)
-docker run --rm agentic-planner-cli "Research machine learning trends" --explain
+docker run --rm agentic-planner-cli "teach me about machine learning" --explain
 
-# 4. Error handling demo (5 seconds)
-docker run --rm agentic-planner-cli ""
+docker run --rm agentic-planner-cli "what should I know about blockchain" --model-profile lite
 
 # Recording commands:
 # asciinema rec demo.cast

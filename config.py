@@ -1,25 +1,26 @@
 """Configuration constants for the Agentic Planner CLI."""
 
-# Model Configuration - Lite vs Full profiles
+# Model Configuration - Use same models with different resource profiles
+# Both profiles use flan-t5-small (80M) + distilbart-cnn (306M) = 386M total
+PLANNING_MODEL = "google/flan-t5-small"
+SUMMARIZATION_MODEL = "sshleifer/distilbart-cnn-12-6"
+
+# Profile differences are in inference configuration, not model choice
 MODEL_PROFILES = {
     "lite": {
-        "planning": "google/flan-t5-base",  # 250M params, faster inference
-        "summarization": "facebook/bart-large-cnn",  # Alternative option
-        "ram_usage": "~800MB",
-        "disk_usage": "~400MB"
+        "description": "Lower memory usage, faster inference",
+        "ram_usage": "~1.2GB",
+        "disk_usage": "~450MB"
     },
     "full": {
-        "planning": "google/flan-t5-small", 
-        "summarization": "sshleifer/distilbart-cnn-12-6",
+        "description": "Standard configuration",
         "ram_usage": "~1.5GB", 
         "disk_usage": "~550MB"
     }
 }
 
-# Default model configuration
+# Default profile
 MODEL_PROFILE = "full"
-PLANNING_MODEL = MODEL_PROFILES[MODEL_PROFILE]["planning"]
-SUMMARIZATION_MODEL = MODEL_PROFILES[MODEL_PROFILE]["summarization"]
 
 # Generation Parameters
 PLANNING_MAX_LENGTH = 80

@@ -111,9 +111,9 @@ def main() -> None:
         description="Agentic Planner CLI - Break down goals into actionable steps",
         epilog="""
 GOOD EXAMPLES:
-  "Find information about quantum computing"
-  "Research artificial intelligence trends"
-  "Explain machine learning basics"
+  "explain quantum computing to me"
+  "help me understand machine learning"
+  "teach me about artificial intelligence"
 
 AVOID THESE:
   "Calculate 2+2" (math problems)
@@ -177,13 +177,11 @@ AVOID THESE:
             print("Architecture: Goal → Plan (Flan-T5-Small) → Execute (Search + Summarize)")
             print("=" * 50)
         
-        # Override model configuration if lite profile requested
-        if args.model_profile == "lite":
-            config.MODEL_PROFILE = "lite"
-            config.PLANNING_MODEL = config.MODEL_PROFILES["lite"]["planning"]
-            config.SUMMARIZATION_MODEL = config.MODEL_PROFILES["lite"]["summarization"]
-            if args.verbose:
-                print(f"[CONFIG] Using lite model profile ({config.MODEL_PROFILES['lite']['ram_usage']} RAM)")
+        # Set model profile for resource reporting
+        config.MODEL_PROFILE = args.model_profile
+        if args.verbose:
+            profile_info = config.MODEL_PROFILES[args.model_profile]
+            print(f"[CONFIG] Using {args.model_profile} profile ({profile_info['ram_usage']} RAM)")
         
         planner = Planner(verbose=args.verbose, explain=args.explain)
         executor = Executor(max_steps=args.max_steps, verbose=args.verbose)
@@ -206,20 +204,19 @@ AVOID THESE:
         total_duration = plan_duration + exec_duration
         
         if args.verbose or args.explain:
-            print(f"\n⏱️  PERFORMANCE BREAKDOWN:")
+            print(f"\n[PERFORMANCE] Execution Breakdown:")
             print(f"   Planning: {plan_duration:.1f}ms ({plan_duration/total_duration*100:.1f}%)")
             print(f"   Execution: {exec_duration:.1f}ms ({exec_duration/total_duration*100:.1f}%)")
             print(f"   Total: {total_duration:.1f}ms")
         
-        if args.verbose:
-            print("\n" + "="*50)
-            print("FINAL RESULT - Agentic Planning Complete")
-            print("="*50)
-        else:
-            print("\n" + "="*50)
-            print("FINAL RESULT:")
-            print("="*50)
+        # Enhanced output formatting for better readability
+        print(f"\n{'='*60}")
+        print(f"GOAL: {goal}")
+        print(f"{'='*60}")
         print(result)
+        print(f"{'='*60}")
+        print(f"AGENTIC PLANNING COMPLETE")
+        print(f"{'='*60}\n")
         
     except KeyboardInterrupt:
         print("\nOperation cancelled by user")
