@@ -1,3 +1,9 @@
+"""Goal decomposition and planning module.
+
+Provides the Planner class that uses Flan-T5-Small to convert natural language
+goals into executable step sequences for the agentic planning system.
+"""
+
 import json
 import re
 from typing import List, Dict, Any, Optional

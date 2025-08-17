@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+"""Agentic Planner CLI - Main entry point.
+
+Command-line interface for demonstrating AI-driven goal decomposition using local
+language models. Converts natural language goals into actionable plans and executes
+them using web search and summarization tools.
+"""
+
 import argparse
 import sys
 import time

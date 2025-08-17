@@ -1,3 +1,9 @@
+"""Logging utilities for agentic planning execution.
+
+Provides structured logging for tool execution timing, performance metrics,
+and debug information throughout the agentic planning workflow.
+"""
+
 import logging
 import sys
 from datetime import datetime

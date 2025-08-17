@@ -1,3 +1,9 @@
+"""Tool execution module for agentic planning.
+
+Provides web search (DuckDuckGo) and text summarization (DistilBART) capabilities
+with robust error handling and retry logic for reliable plan execution.
+"""
+
 import requests
 import json
 import time
